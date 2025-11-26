@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "package": "net.rizen.submarines.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "common.entity.EntityMixin",
+    "common.entity.PlayerEntityMixin",
+    "common.inventory.PlayerInventoryMixin"
+  ],
+  "client": [
+    "client.entity.ClientPlayerEntityMixin",
+    "client.render.HeldItemRendererMixin",
+    "client.hud.InGameHudMixin",
+    "client.MinecraftClientMixin",
+    "client.input.MouseMixin",
+    "client.render.PlayerEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

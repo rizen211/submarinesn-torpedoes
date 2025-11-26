@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "submarines",
+	"version": "${version}",
+	"name": "Submarines'n Torpedoes",
+	"description": "Adds submarines with sonar, homing torpedoes, and underwater combat to Minecraft.",
+	"authors": [
+		"rizen"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/submarinesn-torpedoes",
+		"sources": "https://github.com/rizen211/submarinesn-torpedoes",
+		"issues": "https://github.com/rizen211/submarinesn-torpedoes/issues"
+	},
+	"license": "GNU General Public License v3",
+	"icon": "assets/submarines/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "net.rizen.submarines.Mod"
+		],
+		"client": [
+			"net.rizen.submarines.client.ClientMod"
+		]
+	},
+	"mixins": [
+		"submarines.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": ">=1.21 <1.21.2",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "submarines:block/manufacturing_table_front",
+    "down": "submarines:block/manufacturing_table_bottom",
+    "up": "submarines:block/manufacturing_table_top",
+    "north": "submarines:block/manufacturing_table_front",
+    "south": "submarines:block/manufacturing_table_side",
+    "east": "submarines:block/manufacturing_table_side",
+    "west": "submarines:block/manufacturing_table_side"
+  }
+}

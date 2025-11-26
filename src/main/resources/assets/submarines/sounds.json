@@ -1,0 +1,35 @@
+{
+  "torpedo_unable_to_fire": {
+    "sounds": [
+      "submarines:torpedo_unable_to_fire"
+    ],
+    "subtitle": "submarines.subtitle.torpedo_unable_to_fire"
+  },
+  "sonar_ping": {
+    "sounds": [
+      "submarines:sonar_ping"
+    ],
+    "subtitle": "submarines.subtitle.sonar_ping"
+  },
+  "torpedo_fire": {
+    "sounds": [
+      "submarines:torpedo_fire"
+    ],
+    "subtitle": "submarines.subtitle.torpedo_fire"
+  },
+  "submarine_motor": {
+    "sounds": [
+      {
+        "name": "submarines:submarine_motor",
+        "stream": true
+      }
+    ],
+    "subtitle": "submarines.subtitle.submarine_motor"
+  },
+  "submarine_repaired": {
+    "sounds": [
+      "submarines:submarine_repaired"
+    ],
+    "subtitle": "submarines.subtitle.submarine_repaired"
+  }
+}
