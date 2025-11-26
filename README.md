@@ -41,3 +41,4 @@ Submarines take damage from explosions and can be repaired using the Submarine R
 ---
 
 For developers: See API.md for extension documentation.
+See the wiki page for detailed info.
