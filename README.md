@@ -40,5 +40,4 @@ Submarines take damage from explosions and can be repaired using the Submarine R
 
 ---
 
-For developers: See API.md for extension documentation.
-See the wiki page for detailed info.
+For developers: See [API.md](https://github.com/rizen211/submarinesn-torpedoes/blob/master/API.md) for extension documentation. See the [wiki](https://github.com/rizen211/submarinesn-torpedoes/wiki) page for detailed info.
