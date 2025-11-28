@@ -10,10 +10,10 @@ import net.rizen.submarines.api.network.packet.SonarPingPacket;
 import net.rizen.submarines.api.network.packet.MovementModeTogglePacket;
 import net.rizen.submarines.api.network.packet.TargetingModeTogglePacket;
 import net.rizen.submarines.api.submarine.BaseSubmarine;
-import net.rizen.submarines.network.packet.ManufacturingCraftPacket;
+import net.rizen.submarines.api.network.packet.ManufacturingCraftPacket;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
@@ -28,77 +28,39 @@ public class NetworkHandler {
         PayloadTypeRegistry.playC2S().register(ManufacturingCraftPacket.ID, ManufacturingCraftPacket.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SubmarineInputPacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.entityId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        submarine.updateInput(
-                                payload.forward(),
-                                payload.backward(),
-                                payload.left(),
-                                payload.right(),
-                                payload.up(),
-                                payload.down()
-                        );
-                    }
-                }
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.entityId(), "input", submarine -> {
+                submarine.updateInput(
+                        payload.forward(),
+                        payload.backward(),
+                        payload.left(),
+                        payload.right(),
+                        payload.up(),
+                        payload.down()
+                );
             });
         });
 
         ServerPlayNetworking.registerGlobalReceiver(TorpedoFirePacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.submarineId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        submarine.fireTorpedo();
-                    }
-                }
-            });
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.submarineId(), "torpedo_fire", BaseSubmarine::fireTorpedo);
         });
 
         ServerPlayNetworking.registerGlobalReceiver(DismountPacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.submarineId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        context.player().setSneaking(false);
-                        context.player().stopRiding();
-                    }
-                }
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.submarineId(), "dismount", submarine -> {
+                context.player().setSneaking(false);
+                context.player().stopRiding();
             });
         });
 
         ServerPlayNetworking.registerGlobalReceiver(SonarPingPacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.submarineId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        submarine.performSonarPing();
-                    }
-                }
-            });
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.submarineId(), "sonar_ping", BaseSubmarine::performSonarPing);
         });
 
         ServerPlayNetworking.registerGlobalReceiver(MovementModeTogglePacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.submarineId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        submarine.cycleMovementMode();
-                    }
-                }
-            });
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.submarineId(), "mode_toggle", BaseSubmarine::cycleMovementMode);
         });
 
         ServerPlayNetworking.registerGlobalReceiver(TargetingModeTogglePacket.ID, (payload, context) -> {
-            context.player().server.execute(() -> {
-                Entity entity = context.player().getWorld().getEntityById(payload.submarineId());
-                if (entity instanceof BaseSubmarine submarine) {
-                    if (submarine.getPassengerList().contains(context.player())) {
-                        submarine.cycleTargetingMode();
-                    }
-                }
-            });
+            SubmarinePacketHelper.withValidatedSubmarine(context, payload.submarineId(), "mode_toggle", BaseSubmarine::cycleTargetingMode);
         });
 
         ServerPlayNetworking.registerGlobalReceiver(ManufacturingCraftPacket.ID, (payload, context) -> {
@@ -135,6 +97,10 @@ public class NetworkHandler {
                     context.player().currentScreenHandler.sendContentUpdates();
                 }
             });
+        });
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            SubmarinePacketHelper.clearPlayerData(handler.player.getUuid());
         });
     }
 }

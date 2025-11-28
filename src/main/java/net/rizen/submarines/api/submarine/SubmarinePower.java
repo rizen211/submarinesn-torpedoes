@@ -1,6 +1,6 @@
 package net.rizen.submarines.api.submarine;
 
-import net.rizen.submarines.item.LightweightTorpedoItem;
+import net.rizen.submarines.api.item.TorpedoItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -34,7 +34,7 @@ public class SubmarinePower {
 
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
-            if (stack.isEmpty() || stack.getItem() instanceof LightweightTorpedoItem) {
+            if (stack.isEmpty() || stack.getItem() instanceof TorpedoItem) {
                 continue;
             }
 

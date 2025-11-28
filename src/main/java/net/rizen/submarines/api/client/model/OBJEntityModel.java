@@ -9,33 +9,14 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 /**
- * Renders an OBJ model for an entity. This handles transforming the model vertices with matrices and
- * sending them to the GPU for rendering with proper lighting, overlay, and color tinting.
+ * Renders OBJ models for entities using a degenerate quad technique.
  *
- * <p><b>Important Notes:</b></p>
- * <ul>
- *   <li><b>Model Triangulation Required:</b> All OBJ models must be triangulated (all faces must be triangles,
- *       not quads or n-gons). Models in this project were created in Blockbench and triangulated using the
- *       MTools plugin by Malik12tree. While triangulation is required for the degenerate quad technique to work,
- *       triangulation alone does not fix rendering artifacts - it simply ensures the geometry is in a consistent
- *       triangle-based format for processing.</li>
- *   <li><b>No Animation Support</b> - OBJ models are static and cannot be animated. The model is
- *       rendered in the exact pose defined in the .obj file. The entire model can be rotated and
- *       positioned using MatrixStack transformations in the renderer, but individual parts cannot move.</li>
- *   <li>Models are loaded once and cached for performance.</li>
- *   <li>All geometry is rendered as a single mesh.</li>
- * </ul>
+ * <p>Each triangle (3 vertices) is rendered as a quad (4 vertices) with the last vertex duplicated
+ * (v0, v1, v2, v2). This technique prevents rendering artifacts in Minecraft's quad-based entity
+ * rendering pipeline, which does not handle pure triangles correctly.
  *
- * <p><b>Technical Implementation - Degenerate Quad Rendering:</b></p>
- * <p>This renderer uses a "degenerate quad" technique to fix rendering artifacts. Each triangle (3 vertices)
- * is rendered as a quad (4 vertices) with the last vertex duplicated (v0, v1, v2, v2).</p>
- *
- * <p><b>Development History:</b> Initially, models were exported from Blockbench with quads (the default),
- * which caused severe rendering artifacts - holes in the model, weird internal triangles connecting to random
- * vertices, and missing faces. Triangulating the models was attempted as a fix, but this barely improved the
- * situation. The degenerate quad rendering technique was the actual solution - by rendering each triangle as
- * a degenerate quad (4 vertices with the last duplicated), Minecraft's quad-based entity rendering pipeline
- * processes them correctly without artifacts.</p>
+ * <p>Models are loaded via {@link OBJLoader}, cached for performance, and rendered as a single mesh.
+ * The entire model can be transformed using MatrixStack, but individual parts cannot be animated.
  */
 public class OBJEntityModel {
     private final Identifier modelId;

@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.rizen.submarines.api.crafting.ManufacturingRecipe;
 import net.rizen.submarines.api.crafting.ManufacturingRecipeRegistry;
-import net.rizen.submarines.network.packet.ManufacturingCraftPacket;
+import net.rizen.submarines.api.network.packet.ManufacturingCraftPacket;
 import net.rizen.submarines.screen.ManufacturingTableScreenHandler;
 
 import java.util.*;

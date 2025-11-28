@@ -13,6 +13,8 @@ public class TacticalSubmarineEntity extends BaseSubmarine {
     private static final float ACCELERATION = 0.005f;
     private static final float DECELERATION = 0.003f;
     private static final float ROTATION_SPEED = 2.0f;
+    private static final float ROTATION_ACCELERATION = 0.5f;
+    private static final float ROTATION_DECELERATION = 0.7f;
     private static final float VERTICAL_SPEED_MULT = 0.4f;
     private static final float BACKWARD_SPEED_MULT = 0.6f;
 
@@ -31,6 +33,7 @@ public class TacticalSubmarineEntity extends BaseSubmarine {
     public TacticalSubmarineEntity(EntityType<? extends TacticalSubmarineEntity> entityType, World world) {
         super(entityType, world,
                 MAX_SPEED, ACCELERATION, DECELERATION, ROTATION_SPEED,
+                ROTATION_ACCELERATION, ROTATION_DECELERATION,
                 VERTICAL_SPEED_MULT, BACKWARD_SPEED_MULT,
                 MAX_POWER, POWER_CONSUMPTION,
                 TORPEDO_COOLDOWN, TORPEDO_ARMING,

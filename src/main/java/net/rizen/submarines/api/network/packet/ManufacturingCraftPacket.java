@@ -1,4 +1,4 @@
-package net.rizen.submarines.network.packet;
+package net.rizen.submarines.api.network.packet;
 
 import net.rizen.submarines.Mod;
 import net.minecraft.network.RegistryByteBuf;
@@ -7,6 +7,9 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+/**
+ * Requests crafting a recipe at a Manufacturing Table.
+ */
 public record ManufacturingCraftPacket(Identifier recipeId, BlockPos tablePos) implements CustomPayload {
 
     public static final CustomPayload.Id<ManufacturingCraftPacket> ID =

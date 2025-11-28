@@ -49,6 +49,8 @@ public class HeavySubmarineEntity extends BaseSubmarine {
     private static final float ACCELERATION = 0.004f;
     private static final float DECELERATION = 0.002f;
     private static final float ROTATION_SPEED = 1.5f;
+    private static final float ROTATION_ACCELERATION = 0.4f;
+    private static final float ROTATION_DECELERATION = 0.6f;
     private static final float VERTICAL_SPEED_MULT = 0.3f;
     private static final float BACKWARD_SPEED_MULT = 0.5f;
 
@@ -67,6 +69,7 @@ public class HeavySubmarineEntity extends BaseSubmarine {
     public HeavySubmarineEntity(EntityType<? extends HeavySubmarineEntity> entityType, World world) {
         super(entityType, world,
             MAX_SPEED, ACCELERATION, DECELERATION, ROTATION_SPEED,
+            ROTATION_ACCELERATION, ROTATION_DECELERATION,
             VERTICAL_SPEED_MULT, BACKWARD_SPEED_MULT,
             MAX_POWER, POWER_CONSUMPTION,
             TORPEDO_COOLDOWN, TORPEDO_ARMING,
@@ -90,6 +93,8 @@ public class HeavySubmarineEntity extends BaseSubmarine {
 | `acceleration` | float | Rate of speed increase |
 | `deceleration` | float | Rate of speed decrease |
 | `rotationSpeed` | float | Turning speed in degrees per tick |
+| `rotationAcceleration` | float | Rate of rotation speed increase |
+| `rotationDeceleration` | float | Rate of rotation speed decrease |
 | `verticalSpeedMult` | float | Multiplier for vertical movement |
 | `backwardSpeedMult` | float | Multiplier for reverse speed |
 | `maxPower` | float | Maximum power capacity |
@@ -230,6 +235,30 @@ public static final EntityType<HeavyTorpedoEntity> HEAVY_TORPEDO_ENTITY = Regist
     .build()
 );
 ```
+
+### Custom Torpedo Items
+
+Custom torpedo items must implement the `TorpedoItem` interface to be recognized by the submarine weapon system:
+
+```java
+package com.example.modid.item;
+
+import net.minecraft.item.Item;
+import net.rizen.submarines.api.item.TorpedoItem;
+
+public class HeavyTorpedoItem extends Item implements TorpedoItem {
+    public HeavyTorpedoItem(Settings settings) {
+        super(settings);
+    }
+}
+```
+
+Items implementing `TorpedoItem` are:
+- Recognized as torpedo ammunition by the weapon system
+- Counted and consumed when firing torpedoes
+- Skipped when the submarine searches for fuel
+
+This interface allows custom torpedo items to work seamlessly with the submarine weapon system without requiring modifications to the core mod.
 
 ---
 
@@ -449,7 +478,8 @@ public class DeepSeaSubmarineEntity extends BaseSubmarine {
 
     public DeepSeaSubmarineEntity(EntityType<? extends DeepSeaSubmarineEntity> entityType, World world) {
         super(entityType, world,
-            0.18f, 0.006f, 0.004f, 2.5f, 0.5f, 0.65f,
+            0.18f, 0.006f, 0.004f, 2.5f, 0.6f, 0.9f,
+            0.5f, 0.65f,
             120.0f, 0.012f,
             50, 70,
             DeepSeaTorpedoEntity::new, TORPEDO_FIRE_COST, TORPEDO_SPAWN_OFFSET,

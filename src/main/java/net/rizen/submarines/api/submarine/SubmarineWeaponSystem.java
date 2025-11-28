@@ -1,6 +1,6 @@
 package net.rizen.submarines.api.submarine;
 
-import net.rizen.submarines.item.LightweightTorpedoItem;
+import net.rizen.submarines.api.item.TorpedoItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 
@@ -34,7 +34,7 @@ public class SubmarineWeaponSystem {
         int count = 0;
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
-            if (stack.getItem() instanceof LightweightTorpedoItem) {
+            if (stack.getItem() instanceof TorpedoItem) {
                 count += stack.getCount();
             }
         }
@@ -52,7 +52,7 @@ public class SubmarineWeaponSystem {
     public boolean findAndConsumeTorpedo(Inventory inventory) {
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack stack = inventory.getStack(i);
-            if (stack.getItem() instanceof LightweightTorpedoItem && !stack.isEmpty()) {
+            if (stack.getItem() instanceof TorpedoItem && !stack.isEmpty()) {
                 stack.decrement(1);
                 inventory.markDirty();
                 return true;

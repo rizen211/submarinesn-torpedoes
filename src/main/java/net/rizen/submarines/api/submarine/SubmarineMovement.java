@@ -12,18 +12,24 @@ public class SubmarineMovement {
     private final float acceleration;
     private final float deceleration;
     private final float rotationSpeed;
+    private final float rotationAcceleration;
+    private final float rotationDeceleration;
     private final float verticalSpeedMultiplier;
     private final float backwardSpeedMultiplier;
 
     private float currentForwardSpeed = 0f;
     private float currentVerticalSpeed = 0f;
+    private float currentRotationSpeed = 0f;
 
     public SubmarineMovement(float maxSpeed, float acceleration, float deceleration,
-                             float rotationSpeed, float verticalSpeedMultiplier, float backwardSpeedMultiplier) {
+                             float rotationSpeed, float rotationAcceleration, float rotationDeceleration,
+                             float verticalSpeedMultiplier, float backwardSpeedMultiplier) {
         this.maxSpeed = maxSpeed;
         this.acceleration = acceleration;
         this.deceleration = deceleration;
         this.rotationSpeed = rotationSpeed;
+        this.rotationAcceleration = rotationAcceleration;
+        this.rotationDeceleration = rotationDeceleration;
         this.verticalSpeedMultiplier = verticalSpeedMultiplier;
         this.backwardSpeedMultiplier = backwardSpeedMultiplier;
     }
@@ -51,12 +57,29 @@ public class SubmarineMovement {
             }
         }
 
-        if (controls.isRotateLeft()) {
-            entity.setYaw(entity.getYaw() - rotationSpeed);
+        float targetRotationSpeed = 0f;
+        if (controls.isRotateLeft()) targetRotationSpeed -= rotationSpeed;
+        if (controls.isRotateRight()) targetRotationSpeed += rotationSpeed;
+
+        if (Math.abs(targetRotationSpeed - currentRotationSpeed) > rotationAcceleration) {
+            if (currentRotationSpeed < targetRotationSpeed) {
+                currentRotationSpeed += rotationAcceleration;
+            } else {
+                currentRotationSpeed -= rotationAcceleration;
+            }
+        } else {
+            currentRotationSpeed = targetRotationSpeed;
         }
-        if (controls.isRotateRight()) {
-            entity.setYaw(entity.getYaw() + rotationSpeed);
+
+        if (!controls.isRotateLeft() && !controls.isRotateRight() && Math.abs(currentRotationSpeed) > 0) {
+            if (currentRotationSpeed > 0) {
+                currentRotationSpeed = Math.max(0, currentRotationSpeed - rotationDeceleration);
+            } else {
+                currentRotationSpeed = Math.min(0, currentRotationSpeed + rotationDeceleration);
+            }
         }
+
+        entity.setYaw(entity.getYaw() + currentRotationSpeed);
 
         float targetVerticalSpeed = 0f;
         if (controls.isMoveUp()) targetVerticalSpeed += currentMaxSpeed * verticalSpeedMultiplier;
@@ -96,6 +119,7 @@ public class SubmarineMovement {
     public void stop() {
         this.currentForwardSpeed = 0f;
         this.currentVerticalSpeed = 0f;
+        this.currentRotationSpeed = 0f;
     }
 
     public float getCurrentForwardSpeed() {
@@ -112,5 +136,13 @@ public class SubmarineMovement {
 
     public void setCurrentVerticalSpeed(float speed) {
         this.currentVerticalSpeed = speed;
+    }
+
+    public float getCurrentRotationSpeed() {
+        return currentRotationSpeed;
+    }
+
+    public void setCurrentRotationSpeed(float speed) {
+        this.currentRotationSpeed = speed;
     }
 }

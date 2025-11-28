@@ -5,7 +5,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.rizen.submarines.Mod;
-import net.rizen.submarines.crafting.DefaultRecipes;
 import org.slf4j.Logger;
 
 import java.util.*;

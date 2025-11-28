@@ -64,6 +64,8 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
      * @param acceleration rate of speed increase
      * @param deceleration rate of speed decrease
      * @param rotationSpeed turning rate in degrees per tick
+     * @param rotationAcceleration rate of rotation speed increase
+     * @param rotationDeceleration rate of rotation speed decrease
      * @param verticalSpeedMult multiplier for vertical movement
      * @param backwardSpeedMult multiplier for reverse speed
      * @param maxPower maximum power capacity
@@ -79,6 +81,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
      */
     public BaseSubmarine(EntityType<? extends BaseSubmarine> entityType, World world,
                          float maxSpeed, float acceleration, float deceleration, float rotationSpeed,
+                         float rotationAcceleration, float rotationDeceleration,
                          float verticalSpeedMult, float backwardSpeedMult,
                          float maxPower, float movementConsumption,
                          int torpedoCooldown, int torpedoArming,
@@ -86,7 +89,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
                          float width, float height, float length) {
         super(entityType, world);
         this.controls = new SubmarineControls();
-        this.movement = new SubmarineMovement(maxSpeed, acceleration, deceleration, rotationSpeed, verticalSpeedMult, backwardSpeedMult);
+        this.movement = new SubmarineMovement(maxSpeed, acceleration, deceleration, rotationSpeed, rotationAcceleration, rotationDeceleration, verticalSpeedMult, backwardSpeedMult);
         this.physics = new SubmarinePhysics();
         this.power = new SubmarinePower(maxPower, movementConsumption);
         this.weaponSystem = new SubmarineWeaponSystem(torpedoCooldown, torpedoArming);
@@ -436,6 +439,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
         this.dataTracker.set(POWER, nbt.getFloat("Power"));
         this.movement.setCurrentForwardSpeed(nbt.getFloat("ForwardSpeed"));
         this.movement.setCurrentVerticalSpeed(nbt.getFloat("VerticalSpeed"));
+        this.movement.setCurrentRotationSpeed(nbt.getFloat("RotationSpeed"));
         this.weaponSystem.setTorpedoCooldown(nbt.getInt("TorpedoCooldown"));
         this.weaponSystem.setPreviousTorpedoCount(nbt.getInt("PreviousTorpedoCount"));
         this.dataTracker.set(MOVEMENT_MODE, nbt.getInt("MovementMode"));
@@ -453,6 +457,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
         nbt.putFloat("Power", this.getPower());
         nbt.putFloat("ForwardSpeed", this.movement.getCurrentForwardSpeed());
         nbt.putFloat("VerticalSpeed", this.movement.getCurrentVerticalSpeed());
+        nbt.putFloat("RotationSpeed", this.movement.getCurrentRotationSpeed());
         nbt.putInt("TorpedoCooldown", this.weaponSystem.getTorpedoCooldown());
         nbt.putInt("PreviousTorpedoCount", this.weaponSystem.getPreviousTorpedoCount());
         nbt.putInt("MovementMode", this.getMovementMode().ordinal());
@@ -542,7 +547,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
             }
         }
 
-        sonarSystem.performPing(this.getWorld(), this.getPos(), this.getYaw());
+        sonarSystem.performPing(this.getWorld(), this.getPos(), this.getYaw(), this);
 
         if (!this.getWorld().isClient) {
             this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(),

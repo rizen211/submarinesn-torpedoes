@@ -11,34 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Parses OBJ model files and converts them into renderable data. This reads the text-based OBJ format
- * and extracts vertex positions, texture coordinates, normals, and face definitions.
+ * Parses OBJ model files and converts them into renderable data.
  *
- * <p><b>Supported Features:</b></p>
- * <ul>
- *   <li>Vertices (v)</li>
- *   <li>Texture coordinates (vt)</li>
- *   <li>Normals (vn)</li>
- *   <li>Faces (f) - triangles only</li>
- * </ul>
+ * <p><b>Supported:</b> Vertices (v), texture coordinates (vt), normals (vn), triangular faces (f)
  *
- * <p><b>Unsupported Features:</b></p>
- * <ul>
- *   <li><b>Animations</b> - OBJ is a static format; models are rendered in a fixed pose</li>
- *   <li>Materials (.mtl files) - Materials are ignored; texture parameter should be used instead</li>
- *   <li>Groups and objects - All geometry is merged into a single mesh</li>
- *   <li>Smooth shading groups - Normals are used as-is from the file</li>
- *   <li>Quads and n-gons - Only triangles are supported (faces with more than 3 vertices are ignored)</li>
- * </ul>
+ * <p><b>Unsupported:</b> Materials (.mtl), groups, smooth shading groups, quads/n-gons
  *
- * <p><b>Important:</b> Models must be fully triangulated before export. This loader only reads triangle faces
- * (quads and n-gons are ignored). However, triangulation alone does not prevent rendering artifacts - models
- * exported as quads had severe artifacts, and triangulating them did not significantly improve rendering.
- * The degenerate quad technique in {@link OBJEntityModel} is the actual fix required for proper rendering
- * in Minecraft's entity system.</p>
- *
- * <p>For animated entities, Minecraft's built-in model format or custom vertex manipulation
- * in the renderer should be considered.</p>
+ * <p><b>Requirements:</b> Models must be fully triangulated (all faces must have exactly 3 vertices).
+ * Quads and n-gons are silently ignored. See {@link OBJEntityModel} for rendering details.
  */
 public class OBJLoader {
 
@@ -60,13 +40,16 @@ public class OBJLoader {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
+            int lineNumber = 0;
             while ((line = reader.readLine()) != null) {
+                lineNumber++;
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) continue;
 
                 String[] parts = line.split("\\s+");
 
-                switch (parts[0]) {
+                try {
+                    switch (parts[0]) {
                     case "v":
                         model.vertices.add(new Vector3f(
                                 Float.parseFloat(parts[1]),
@@ -113,6 +96,17 @@ public class OBJLoader {
                         }
                         model.triangles.add(tri);
                         break;
+                    }
+                } catch (NumberFormatException e) {
+                    throw new IOException(String.format(
+                        "Malformed OBJ file: Invalid number format at line %d: '%s'",
+                        lineNumber, line
+                    ), e);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    throw new IOException(String.format(
+                        "Malformed OBJ file: Missing required data at line %d: '%s'",
+                        lineNumber, line
+                    ), e);
                 }
             }
         }

@@ -1,7 +1,11 @@
 package net.rizen.submarines.api.submarine.sonar;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -54,12 +58,12 @@ public class SonarSystem {
         return angle;
     }
 
-    public void performPing(World world, Vec3d submarinePos, float submarineYaw) {
+    public void performPing(World world, Vec3d submarinePos, float submarineYaw, Entity submarine) {
         lastPingTime = System.currentTimeMillis();
         contacts.clear();
 
         detectEntities(world, submarinePos, submarineYaw);
-        detectTerrain(world, submarinePos, submarineYaw);
+        detectTerrain(world, submarinePos, submarineYaw, submarine);
     }
 
     private void detectEntities(World world, Vec3d submarinePos, float submarineYaw) {
@@ -89,24 +93,31 @@ public class SonarSystem {
         }
     }
 
-    private void detectTerrain(World world, Vec3d submarinePos, float submarineYaw) {
+    private void detectTerrain(World world, Vec3d submarinePos, float submarineYaw, Entity submarine) {
         for (int angleDeg = 0; angleDeg < 360; angleDeg += 3) {
             float worldAngle = submarineYaw + angleDeg;
             float yawRad = (float) Math.toRadians(worldAngle);
             Vec3d direction = new Vec3d(-Math.sin(yawRad), 0, Math.cos(yawRad));
 
-            for (double dist = 5.0; dist <= MAX_RANGE; dist += 1.0) {
-                Vec3d checkPos = submarinePos.add(direction.multiply(dist));
-                net.minecraft.util.math.BlockPos blockPos = net.minecraft.util.math.BlockPos.ofFloored(checkPos);
+            Vec3d start = submarinePos.add(direction.multiply(5.0));
+            Vec3d end = submarinePos.add(direction.multiply(MAX_RANGE));
 
-                net.minecraft.block.BlockState blockState = world.getBlockState(blockPos);
-                if (!blockState.isAir() && blockState.isSolidBlock(world, blockPos)) {
-                    if (isBlockUnderwater(world, blockPos)) {
-                        Vec3d relativePos = checkPos.subtract(submarinePos);
-                        float angle = calculateAngle(relativePos, submarineYaw);
-                        contacts.add(new SonarContact(relativePos, ContactType.TERRAIN, dist, angle, lastPingTime));
-                        break;
-                    }
+            BlockHitResult hitResult = world.raycast(new RaycastContext(
+                start,
+                end,
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                submarine
+            ));
+
+            if (hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockPos blockPos = hitResult.getBlockPos();
+                if (isBlockUnderwater(world, blockPos)) {
+                    Vec3d hitPos = hitResult.getPos();
+                    Vec3d relativePos = hitPos.subtract(submarinePos);
+                    double dist = relativePos.length();
+                    float angle = calculateAngle(relativePos, submarineYaw);
+                    contacts.add(new SonarContact(relativePos, ContactType.TERRAIN, dist, angle, lastPingTime));
                 }
             }
         }
@@ -116,7 +127,7 @@ public class SonarSystem {
         return entity.isSubmergedInWater() || entity.isTouchingWater();
     }
 
-    private boolean isBlockUnderwater(World world, net.minecraft.util.math.BlockPos blockPos) {
+    private boolean isBlockUnderwater(World world, BlockPos blockPos) {
         return !world.getFluidState(blockPos.up()).isEmpty() ||
                !world.getFluidState(blockPos).isEmpty();
     }
