@@ -46,7 +46,7 @@ public class TacticalSubmarineEntity extends BaseSubmarine {
     }
 
     @Override
-    public net.minecraft.util.math.Vec3d getPassengerRidingPos(Entity passenger) {
+    public Vec3d getPassengerRidingPos(Entity passenger) {
         float yawRad = (float) Math.toRadians(this.getYaw());
 
         double forwardOffset = 0.0;

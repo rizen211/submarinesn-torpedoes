@@ -4,15 +4,16 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "common.entity.EntityMixin",
+    "common.entity.LivingEntityMixin",
     "common.entity.PlayerEntityMixin",
     "common.inventory.PlayerInventoryMixin"
   ],
   "client": [
-    "client.entity.ClientPlayerEntityMixin",
-    "client.render.HeldItemRendererMixin",
-    "client.hud.InGameHudMixin",
     "client.MinecraftClientMixin",
+    "client.entity.ClientPlayerEntityMixin",
+    "client.hud.InGameHudMixin",
     "client.input.MouseMixin",
+    "client.render.HeldItemRendererMixin",
     "client.render.PlayerEntityRendererMixin"
   ],
   "injectors": {

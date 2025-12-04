@@ -4,8 +4,7 @@ package net.rizen.submarines.api.submarine;
  * The three speed settings available to submarines. Each mode is a tradeoff between speed, stealth, and power usage.
  *
  * Silent mode moves slowly but uses minimal power and makes less noise. Cruise has balanced performance.
- * Flank speed is for when you need maximum speed and do not care about being heard
- * or burning through your power reserves.
+ * Flank speed is for when maximum speed is required regardless of noise or power consumption.
  */
 public enum MovementMode {
     /**

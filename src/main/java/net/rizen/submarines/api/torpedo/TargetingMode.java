@@ -1,8 +1,8 @@
 package net.rizen.submarines.api.torpedo;
 
 /**
- * Controls what types of entities your torpedoes will lock onto and track. This lets you focus your weapons
- * on specific threat types instead of wasting torpedoes on random fish.
+ * Controls what types of entities torpedoes will lock onto and track. This allows targeting specific
+ * threat types instead of locking onto non-threatening entities.
  */
 public enum TargetingMode {
     /**

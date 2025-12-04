@@ -1,7 +1,6 @@
 package net.rizen.submarines.mixin.common.entity;
 
 import net.rizen.submarines.api.submarine.BaseSubmarine;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

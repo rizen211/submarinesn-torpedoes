@@ -1,6 +1,6 @@
 # Submarines'n Torpedoes - Developer API
 
-This document explains how to extend the Submarines mod with custom submarines, torpedoes, and manufacturing recipes. The API is designed to provide controlled extension points while keeping core systems (physics, guidance, power management) internal.
+This API documentation describes how to extend the Submarines mod with custom submarines, torpedoes, and manufacturing recipes. The API provides controlled extension points while keeping core systems (physics, guidance, power management) internal.
 
 ---
 
@@ -79,13 +79,28 @@ public class HeavySubmarineEntity extends BaseSubmarine {
     }
 
     @Override
+    public Vec3d getPassengerRidingPos(Entity passenger) {
+        // Calculate passenger position based on submarine rotation
+        float yawRad = (float) Math.toRadians(this.getYaw());
+
+        double forwardOffset = 0.0;  // Adjust for the model
+        double upOffset = 4.0;       // Height where player sits
+
+        double x = this.getX() - Math.sin(yawRad) * forwardOffset;
+        double y = this.getY() + upOffset;
+        double z = this.getZ() + Math.cos(yawRad) * forwardOffset;
+
+        return new Vec3d(x, y, z);
+    }
+
+    @Override
     public Text getDisplayName() {
         return Text.translatable("entity.modid.heavy_submarine");
     }
 }
 ```
 
-### Constructor Parameters Explained
+### Constructor Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -133,9 +148,50 @@ new Vec3d(3.0, -1.0, 0)
 
 The offset's X component represents forward/backward distance (positive = forward), Y is vertical offset, and Z is not used (rotation is applied automatically based on submarine yaw).
 
-### Passenger Positioning
+### Required Method Overrides
 
-The `getPassengerRidingPos()` method controls where players sit in the submarine. The method calculates the position based on the submarine's rotation and configured offsets.
+#### getPassengerRidingPos(Entity passenger)
+
+**Required.** This method controls where players sit when riding the submarine. Implementations must position passengers correctly for the submarine's model and size.
+
+```java
+@Override
+public Vec3d getPassengerRidingPos(Entity passenger) {
+    float yawRad = (float) Math.toRadians(this.getYaw());
+
+    // Customize these values for the submarine model:
+    double forwardOffset = 0.0;  // Positive moves passenger forward
+    double upOffset = 4.0;       // Height where player sits (from submarine base)
+
+    // Calculate world position with rotation applied
+    double x = this.getX() - Math.sin(yawRad) * forwardOffset;
+    double y = this.getY() + upOffset;
+    double z = this.getZ() + Math.cos(yawRad) * forwardOffset;
+
+    return new Vec3d(x, y, z);
+}
+```
+
+**Note:** The `upOffset` parameter should match the height of the submarine's cockpit or control area. The `forwardOffset` parameter moves the passenger forward (positive) or backward (negative) from the submarine's center point.
+
+#### getDisplayName()
+
+**Required.** Returns the display name for the submarine type. Should use a translation key that corresponds to an entry in the language files.
+
+```java
+@Override
+public Text getDisplayName() {
+    return Text.translatable("entity.modid.heavy_submarine");
+}
+```
+
+The corresponding translation must be added to `assets/modid/lang/en_us.json`:
+
+```json
+{
+  "entity.modid.heavy_submarine": "Heavy Submarine"
+}
+```
 
 ### Entity Registration
 
@@ -194,7 +250,7 @@ public class HeavyTorpedoEntity extends BaseTorpedo {
 }
 ```
 
-### Constructor Parameters Explained
+### Constructor Parameters
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -217,7 +273,7 @@ All torpedoes automatically include:
 - **Collision detection** - Explodes on impact with blocks or entities
 - **Particle effects** - Bubble trail while traveling
 
-No additional implementation is required for these features.
+These features are provided automatically without additional implementation.
 
 ### Entity Registration
 
@@ -258,7 +314,7 @@ Items implementing `TorpedoItem` are:
 - Counted and consumed when firing torpedoes
 - Skipped when the submarine searches for fuel
 
-This interface allows custom torpedo items to work seamlessly with the submarine weapon system without requiring modifications to the core mod.
+Custom torpedo items implementing this interface work seamlessly with the submarine weapon system without requiring modifications to the core mod.
 
 ---
 
@@ -288,7 +344,7 @@ public class HeavySubmarineRenderer extends BaseOBJEntityRenderer<BaseSubmarine>
 
 ### File Locations
 
-Place OBJ models and textures in the resources directory:
+OBJ models and textures are placed in the resources directory:
 
 ```
 src/main/resources/
@@ -305,7 +361,7 @@ src/main/resources/
 
 ### Renderer Registration
 
-Register renderers in the client initializer:
+Renderers are registered in the client initializer:
 
 ```java
 @Override
@@ -317,14 +373,14 @@ public void onInitializeClient() {
 
 ### OBJ Model Requirements
 
-- Models must use **triangulated faces** (no quads or n-gons)
-- Export with vertex normals and UV coordinates
-- Model should face **forward on the Z+ axis** in modeling software
+- Models use **triangulated faces** (no quads or n-gons)
+- Models are exported with vertex normals and UV coordinates
+- Models face **forward on the Z+ axis** in modeling software
 - The renderer handles rotation automatically based on entity yaw
 
-### Advanced Rendering
+### Renderer Customization
 
-`BaseOBJEntityRenderer` provides protected methods for customization:
+`BaseOBJEntityRenderer` provides protected methods for entity customization:
 - `getColor()` - Apply color tinting to the model
 - `applyTransformations()` - Apply additional transformations (scale, rotation, translation)
 - `getRenderLayer()` - Change the render layer
@@ -334,7 +390,7 @@ public void onInitializeClient() {
 
 ## Manufacturing Recipes
 
-### Creating Recipes
+### Recipe Definition
 
 Manufacturing recipes are defined using a builder pattern:
 
@@ -384,7 +440,7 @@ Three categories are available for organizing recipes in the GUI:
 
 ### Registering Recipes
 
-Call the registration method in the mod initializer:
+The registration method is called in the mod initializer:
 
 ```java
 @Override
@@ -408,7 +464,7 @@ public void onInitialize() {
 
 ## What NOT to Extend
 
-The following classes are internal implementation details and should **not** be extended or modified:
+The following classes are internal implementation details and are **not** extended or modified:
 
 ### Submarine Internals
 
@@ -450,13 +506,13 @@ protected final SubmarineInventory inventory;
 protected final SonarSystem sonarSystem;
 ```
 
-These are provided for **read-only use** in subclass methods (like `fireTorpedo()`). Do not attempt to override or replace these instances.
+These are provided for **read-only use** in subclass methods (like `fireTorpedo()`). Overriding or replacing these instances is not supported.
 
 ---
 
 ## Complete Example
 
-Here's a complete example mod adding a new submarine:
+The following example demonstrates a complete mod implementation adding a new submarine:
 
 ### Entity Class
 
@@ -630,17 +686,17 @@ public class DeepSeaClient implements ClientModInitializer {
 
 ## Summary
 
-The Submarines mod API provides focused extension points for creating gameplay variety while protecting core systems. When creating custom content:
+The Submarines mod API provides focused extension points for creating gameplay variety while protecting core systems. Custom content follows these patterns:
 
-✅ **DO** extend `BaseSubmarine` and `BaseTorpedo` with different stats
-✅ **DO** use `TorpedoSpawner` (method references) to configure torpedo types
-✅ **DO** use `BaseOBJEntityRenderer` for custom models
-✅ **DO** create `ManufacturingRecipe` entries for custom items
-✅ **DO** read protected fields in `BaseSubmarine` when needed
+✅ **Recommended** - Extend `BaseSubmarine` and `BaseTorpedo` with different stats
+✅ **Recommended** - Use `TorpedoSpawner` (method references) to configure torpedo types
+✅ **Recommended** - Use `BaseOBJEntityRenderer` for custom models
+✅ **Recommended** - Create `ManufacturingRecipe` entries for custom items
+✅ **Recommended** - Read protected fields in `BaseSubmarine` when needed
 
-❌ **DON'T** extend or modify internal system classes
-❌ **DON'T** attempt to override physics or guidance algorithms
-❌ **DON'T** replace component instances (`power`, `weaponSystem`, etc.)
-❌ **DON'T** override `fireTorpedo()` unless custom behavior is required
+❌ **Not Supported** - Extending or modifying internal system classes
+❌ **Not Supported** - Overriding physics or guidance algorithms
+❌ **Not Supported** - Replacing component instances (`power`, `weaponSystem`, etc.)
+❌ **Not Supported** - Overriding `fireTorpedo()` unless custom behavior is required
 
 The API is designed to enable creative submarine variants without exposing implementation complexity. All complex systems (physics, guidance, power management, torpedo firing) work automatically once stats are configured.

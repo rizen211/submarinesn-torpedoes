@@ -2,6 +2,7 @@ package net.rizen.submarines.api.torpedo;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
@@ -93,6 +94,10 @@ public class TorpedoPhysics {
                 continue;
             }
 
+            if (entity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(StatusEffects.INVISIBILITY)) {
+                continue;
+            }
+
             Vec3d entityPos = entity.getPos();
             double distance = torpedoPos.distanceTo(entityPos);
 
@@ -140,6 +145,10 @@ public class TorpedoPhysics {
         }
 
         if (!target.isSubmergedInWater()) {
+            return false;
+        }
+
+        if (target instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(StatusEffects.INVISIBILITY)) {
             return false;
         }
 

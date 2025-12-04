@@ -1,8 +1,8 @@
 package net.rizen.submarines.api.submarine.sonar;
 
 /**
- * Different types of contacts that sonar can detect underwater. The sonar system categorizes what it finds
- * so you can tell the difference between a threat like another submarine and harmless things like dropped items.
+ * Different types of contacts that sonar can detect underwater. The sonar system categorizes detected entities
+ * to distinguish between threats like other submarines and harmless objects like dropped items.
  */
 public enum ContactType {
     /**
@@ -22,7 +22,7 @@ public enum ContactType {
      */
     ITEM,
     /**
-     * Other submarines. These are your primary threats.
+     * Other submarines. Primary threats in underwater combat.
      */
     SUBMARINE,
     /**

@@ -128,4 +128,8 @@ public class SubmarinePower {
     public void setCurrentPower(float power) {
         this.currentPower = Math.max(0, Math.min(maxPower, power));
     }
+
+    public float getMaxPower() {
+        return maxPower;
+    }
 }

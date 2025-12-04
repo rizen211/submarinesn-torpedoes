@@ -79,7 +79,7 @@ public class SubmarineHud implements HudRenderCallback {
 
         int startX = screenWidth - submarineWidth - gap;
 
-        int startY = screenHeight - 90;
+        int startY = screenHeight - 125;
 
         float health = submarine.getHealth();
         float power = submarine.getPower();
@@ -122,6 +122,18 @@ public class SubmarineHud implements HudRenderCallback {
             drawContext.drawText(client.textRenderer,
                     Text.translatable("submarines.hud.sonar.ping_hint"),
                     startX, textY + 84, 0xFFAAAAAA, false);
+
+            float cooldownProgress = SubmarineInputHandler.getSonarCooldownProgress();
+            int barWidth = 100;
+            int barHeight = 4;
+            int barX = startX;
+            int barY = textY + 96;
+
+            drawContext.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF333333);
+
+            int fillWidth = (int) (barWidth * cooldownProgress);
+            int barColor = cooldownProgress >= 1.0f ? 0xFF00FF00 : 0xFF888888;
+            drawContext.fill(barX, barY, barX + fillWidth, barY + barHeight, barColor);
         }
     }
 
@@ -133,7 +145,7 @@ public class SubmarineHud implements HudRenderCallback {
 
         int startX = gap;
 
-        int startY = screenHeight - 90;
+        int startY = screenHeight - 125;
 
         int textY = startY;
 

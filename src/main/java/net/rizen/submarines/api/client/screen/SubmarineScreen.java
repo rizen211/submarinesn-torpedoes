@@ -10,7 +10,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /**
- * The inventory screen that shows up when you open the submarine inventory.
+ * The inventory screen displayed when the submarine inventory is opened.
  */
 public class SubmarineScreen extends HandledScreen<SubmarineScreenHandler> {
     private static final Identifier TEXTURE = Identifier.of("minecraft", "textures/gui/container/generic_54.png");

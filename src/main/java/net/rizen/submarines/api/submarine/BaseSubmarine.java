@@ -1,5 +1,6 @@
 package net.rizen.submarines.api.submarine;
 
+import net.minecraft.text.Text;
 import net.rizen.submarines.api.submarine.sonar.SonarSystem;
 import net.rizen.submarines.api.torpedo.TargetingMode;
 import net.minecraft.entity.Entity;
@@ -53,6 +54,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
     private final Vec3d torpedoSpawnOffset;
 
     private boolean wasMoving = false;
+    private boolean wasLowPower = false;
 
     /**
      * Creates a new submarine with all stats and components. Sets up movement physics, power system,
@@ -163,6 +165,7 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
             this.dataTracker.set(SPEED, movement.getSignedSpeed());
 
             breakLilyPads();
+            handleLowPowerWarning();
         }
 
         handleMotorSound();
@@ -204,6 +207,20 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
             case CRUISE -> 1.0f;
             case FLANK -> 1.2f;
         };
+    }
+
+    private void handleLowPowerWarning() {
+        float currentPower = power.getCurrentPower();
+        float maxPower = power.getMaxPower();
+        boolean isLowPower = (currentPower / maxPower) < 0.1f;
+
+        if (isLowPower && !wasLowPower) {
+            this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(),
+                    net.rizen.submarines.Mod.SUBMARINE_LOW_POWER,
+                    net.minecraft.sound.SoundCategory.NEUTRAL, 2.0f, 1.0f);
+        }
+
+        wasLowPower = isLowPower;
     }
 
     private void breakLilyPads() {
@@ -593,4 +610,24 @@ public abstract class BaseSubmarine extends Entity implements NamedScreenHandler
     public void cycleTargetingMode() {
         setTargetingMode(getTargetingMode().next());
     }
+
+    /**
+     * Determines the position where passengers (players) sit when riding this submarine.
+     * This method should be overridden by subclasses to position passengers correctly
+     * based on the submarine's model and size.
+     *
+     * @param passenger the entity riding the submarine
+     * @return the world position where the passenger should be rendered
+     */
+    @Override
+    public abstract Vec3d getPassengerRidingPos(Entity passenger);
+
+    /**
+     * Returns the display name for this submarine type. Should use a translation key
+     * that corresponds to an entry in the language files (e.g., lang/en_us.json).
+     *
+     * @return the translated display name text
+     */
+    @Override
+    public abstract Text getDisplayName();
 }

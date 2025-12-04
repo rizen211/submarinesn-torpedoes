@@ -158,6 +158,12 @@ public class Mod implements ModInitializer {
 			SoundEvent.of(Identifier.of(MOD_ID, "submarine_repaired"))
 	);
 
+	public static final SoundEvent SUBMARINE_LOW_POWER = Registry.register(
+			Registries.SOUND_EVENT,
+			Identifier.of(MOD_ID, "submarine_low_power"),
+			SoundEvent.of(Identifier.of(MOD_ID, "submarine_low_power"))
+	);
+
 	public static final RegistryKey<ItemGroup> SUBMARINES_GROUP = RegistryKey.of(
 			RegistryKeys.ITEM_GROUP,
 			Identifier.of(MOD_ID, "submarines")

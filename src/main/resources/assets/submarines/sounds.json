@@ -31,5 +31,11 @@
       "submarines:submarine_repaired"
     ],
     "subtitle": "submarines.subtitle.submarine_repaired"
+  },
+  "submarine_low_power": {
+    "sounds": [
+      "submarines:submarine_low_power"
+    ],
+    "subtitle": "submarines.subtitle.submarine_low_power"
   }
 }

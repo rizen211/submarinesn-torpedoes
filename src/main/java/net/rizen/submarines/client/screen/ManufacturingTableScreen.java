@@ -155,7 +155,7 @@ public class ManufacturingTableScreen extends HandledScreen<ManufacturingTableSc
             }
         }
 
-        craftButton.active = selectedRecipe != null &&
+        craftButton.active = selectedRecipe != null && this.client.player != null &&
                              ManufacturingRecipeRegistry.hasIngredients(this.client.player.getInventory(), selectedRecipe);
     }
 
@@ -224,6 +224,7 @@ public class ManufacturingTableScreen extends HandledScreen<ManufacturingTableSc
     }
 
     private void renderRecipeDetails(DrawContext context, int x, int y) {
+        if (this.client.player == null) return;
         PlayerInventory inventory = this.client.player.getInventory();
 
         context.drawText(this.textRenderer, "Required Materials:", x, y, COLOR_ACCENT, true);
@@ -273,6 +274,7 @@ public class ManufacturingTableScreen extends HandledScreen<ManufacturingTableSc
         }
 
         if (ManufacturingRecipeRegistry.hasIngredients(this.client.player.getInventory(), selectedRecipe)) {
+            craftButton.active = false;
             ClientPlayNetworking.send(new ManufacturingCraftPacket(
                 selectedRecipe.getId(),
                 this.handler.getTablePos()

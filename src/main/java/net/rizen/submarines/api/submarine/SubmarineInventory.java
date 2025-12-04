@@ -9,8 +9,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 
 /**
- * The storage system for submarines. This holds 27 slots for fuel, torpedoes, and whatever else you want to carry.
- * The inventory can save and load its contents to NBT so items persist when you log out or unload chunks.
+ * The storage system for submarines. This holds 27 slots for fuel, torpedoes, and other items.
+ * The inventory can save and load its contents to NBT so items persist when the world is unloaded or chunks are unloaded.
  */
 public class SubmarineInventory implements Inventory {
     private final DefaultedList<ItemStack> items;

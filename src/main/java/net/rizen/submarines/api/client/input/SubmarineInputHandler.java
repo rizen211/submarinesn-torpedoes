@@ -37,6 +37,11 @@ public class SubmarineInputHandler {
     private static boolean wasDown = false;
     private static boolean wasLeftMousePressed = false;
 
+    private static boolean wasHudTogglePressed = false;
+    private static boolean wasMovementTogglePressed = false;
+    private static boolean wasTargetingTogglePressed = false;
+    private static boolean wasSonarTogglePressed = false;
+
     private static boolean sonarEnabled = false;
     private static long lastSonarPingTime = 0;
     private static final long SONAR_PING_COOLDOWN = 3000;
@@ -91,19 +96,27 @@ public class SubmarineInputHandler {
                 handleSubmarineInput(client, submarine);
             } else {
                 wasLeftMousePressed = false;
+                wasHudTogglePressed = false;
+                wasMovementTogglePressed = false;
+                wasTargetingTogglePressed = false;
+                wasSonarTogglePressed = false;
                 submarineHudMode = true;
             }
         });
     }
 
     private static void handleSubmarineInput(MinecraftClient client, BaseSubmarine submarine) {
-        if (hudModeToggleKey.wasPressed()) {
+        long currentTime = System.currentTimeMillis();
+
+        boolean hudTogglePressed = hudModeToggleKey.isPressed();
+        if (hudTogglePressed && !wasHudTogglePressed) {
             submarineHudMode = !submarineHudMode;
             client.player.sendMessage(
                 Text.translatable(submarineHudMode ? "submarines.hud.submarine_mode" : "submarines.hud.player_mode"),
                 true
             );
         }
+        wasHudTogglePressed = hudTogglePressed;
 
         if (dismountKey.wasPressed()) {
             DismountPacket packet = new DismountPacket(submarine.getId());
@@ -111,7 +124,8 @@ public class SubmarineInputHandler {
             return;
         }
 
-        if (sonarToggleKey.wasPressed()) {
+        boolean sonarTogglePressed = sonarToggleKey.isPressed();
+        if (sonarTogglePressed && !wasSonarTogglePressed) {
             if (submarineHudMode) {
                 sonarEnabled = !sonarEnabled;
                 client.player.sendMessage(
@@ -120,8 +134,10 @@ public class SubmarineInputHandler {
                 );
             }
         }
+        wasSonarTogglePressed = sonarTogglePressed;
 
-        if (movementModeToggleKey.wasPressed()) {
+        boolean movementTogglePressed = movementModeToggleKey.isPressed();
+        if (movementTogglePressed && !wasMovementTogglePressed) {
             if (submarineHudMode) {
                 MovementModeTogglePacket packet = new MovementModeTogglePacket(submarine.getId());
                 ClientPlayNetworking.send(packet);
@@ -131,8 +147,10 @@ public class SubmarineInputHandler {
                 );
             }
         }
+        wasMovementTogglePressed = movementTogglePressed;
 
-        if (targetingModeToggleKey.wasPressed()) {
+        boolean targetingTogglePressed = targetingModeToggleKey.isPressed();
+        if (targetingTogglePressed && !wasTargetingTogglePressed) {
             if (submarineHudMode) {
                 TargetingModeTogglePacket packet = new TargetingModeTogglePacket(submarine.getId());
                 ClientPlayNetworking.send(packet);
@@ -142,10 +160,10 @@ public class SubmarineInputHandler {
                 );
             }
         }
+        wasTargetingTogglePressed = targetingTogglePressed;
 
         if (sonarPingKey.wasPressed()) {
             if (submarineHudMode && sonarEnabled) {
-                long currentTime = System.currentTimeMillis();
                 long timeSinceLastPing = currentTime - lastSonarPingTime;
 
                 if (timeSinceLastPing >= SONAR_PING_COOLDOWN) {
@@ -163,12 +181,6 @@ public class SubmarineInputHandler {
                             true
                         );
                     }
-                } else {
-                    long remainingCooldown = (SONAR_PING_COOLDOWN - timeSinceLastPing) / 1000;
-                    client.player.sendMessage(
-                        Text.translatable("submarines.sonar.recharging", (remainingCooldown + 1)),
-                        true
-                    );
                 }
             }
         }
@@ -225,5 +237,14 @@ public class SubmarineInputHandler {
 
     public static boolean isSubmarineHudMode() {
         return submarineHudMode;
+    }
+
+    public static float getSonarCooldownProgress() {
+        long currentTime = System.currentTimeMillis();
+        long timeSinceLastPing = currentTime - lastSonarPingTime;
+        if (timeSinceLastPing >= SONAR_PING_COOLDOWN) {
+            return 1.0f;
+        }
+        return (float) timeSinceLastPing / SONAR_PING_COOLDOWN;
     }
 }
